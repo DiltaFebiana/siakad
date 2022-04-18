@@ -6,6 +6,7 @@ use App\Models\Mahasiswa;
 use Illuminate\Http\Request; 
 use Illuminate\Support\Facades\DB;
 use App\Models\Kelas;
+use PDF;
  
 class MahasiswaController extends Controller 
 { 
@@ -23,6 +24,11 @@ class MahasiswaController extends Controller
         $paginate = Mahasiswa::orderBy('id_mahasiswa', 'asc')->paginate(3);         
         return view('mahasiswa.index', ['mahasiswa' => $mahasiswa,'paginate'=>$paginate]);
     }
+    public function cetak_pdf($Nim){
+        $mahasiswa = Mahasiswa::where('nim', $Nim)->first();
+        $pdf = PDF::loadview('mahasiswa.nilai_cetakpdf',['mahasiswa'=>$mahasiswa]);
+        return $pdf->stream();
+    }
     public function create() 
     { 
         $kelas = Kelas::all();//mendapatkan data dari tabel kelas
@@ -36,6 +42,7 @@ class MahasiswaController extends Controller
             'Nama' => 'required', 
             'Kelas' => 'required', 
             'Jurusan' => 'required', 
+            'foto' => 'required|file|image|mimes:jpeg,png,jpg|max:1024',
             // 'Email' => 'required',
             // 'Alamat' => 'required',
             // 'Tanggal_lahir' => 'required',
@@ -45,6 +52,7 @@ class MahasiswaController extends Controller
         $mahasiswa->nim = $request->get('Nim');
         $mahasiswa->nama = $request->get('Nama');
         $mahasiswa->jurusan = $request->get('Jurusan');
+        $mahasiswa->foto = $request->file('foto')->store('images', 'public');
         $mahasiswa->save();
 
         $kelas = new Kelas;
@@ -88,12 +96,18 @@ class MahasiswaController extends Controller
             'Nama' => 'required', 
             'Kelas' => 'required', 
             'Jurusan' => 'required', 
+            'foto' => 'required|file|image|mimes:jpeg,png,jpg|max:1024',
                     
         ]); 
 
         $mahasiswa = Mahasiswa::with('kelas')->where('nim', $Nim)->first();
         $mahasiswa->nim = $request->get('Nim');
         $mahasiswa->nama = $request->get('Nama');
+        if($mahasiswa->foto && file_exists(storage_path('app/public/'. $mahasiswa->foto))){
+            \Storage::delete('public/'. $mahasiswa->foto);
+        }
+        $image_name = $request->file('foto')->store('images', 'public');
+        $mahasiswa->foto = $image_name;
         $mahasiswa->jurusan = $request->get('Jurusan');
         $mahasiswa->save();
 
