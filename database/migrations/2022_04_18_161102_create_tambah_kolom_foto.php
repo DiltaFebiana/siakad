@@ -26,7 +26,7 @@ class CreateTambahKolomFoto extends Migration
     public function down()
     {
         Schema::table('mahasiswa', function (Blueprint $table) {
-            $table->dropColumn('foto');;   
+            $table->dropColumn('foto')   
         });
     }
 }

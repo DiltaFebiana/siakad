@@ -2,7 +2,7 @@
  
 namespace App\Models; 
  
-//  use Illuminate\Contracts\Auth\MustVerifyEmail;  
+ use Illuminate\Contracts\Auth\MustVerifyEmail;  
  use Illuminate\Database\Eloquent\Factories\HasFactory;  
 //  use Illuminate\Foundation\Auth\Mahasiswa as Authenticatable;  
 //  use Illuminate\Notifications\Notifiable; 
@@ -24,8 +24,7 @@ class Mahasiswa extends Model //Definisi Model
         'jurusan',
         'foto',    
     ]; 
-
     public function kelas(){
         return $this->belongsTo(Kelas::class);
     }
-}; 
+}
